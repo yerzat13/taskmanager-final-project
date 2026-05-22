@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Abdrassulayev Yerzat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 5px;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-sm {
+            width: auto;
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 2px;
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+            cursor: pointer;
+        }
+
+        .main-container {
+            display: none;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .task-card {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+<div id="authContainer" class="auth-container">
+    <div class="auth-card">
+        <h2 id="authTitle">Login</h2>
+        <form id="authForm">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="form-group" id="emailGroup" style="display:none;">
+                <label>Email</label>
+                <input type="email" id="email">
+            </div>
+            <div class="form-group" id="fullNameGroup" style="display:none;">
+                <label>Full Name</label>
+                <input type="text" id="fullName">
+            </div>
+            <button type="submit" class="btn">Submit</button>
+        </form>
+        <div class="switch-link" id="switchLink">Don't have an account? Register</div>
+    </div>
+</div>
+
+<div id="mainContainer" class="main-container">
+    <div class="navbar">
+        <div class="container">
+            <h1>📋 Task Manager - Abdrassulayev Yerzat</h1>
+            <div class="user-info">
+                <span id="currentUser"></span>
+                <button class="btn btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="statsTasks">0</h3>
+                <p>Total Tasks</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="statsProjects">0</h3>
+                <p>Total Projects</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="statsStorage">0 KB</h3>
+                <p>Storage Used</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📁 Projects</h3>
+            <div class="filters">
+                <input type="text" id="projectSearch" placeholder="Search projects..." onkeyup="loadProjects()">
+                <button class="btn btn-sm" onclick="showCreateProjectModal()">+ New Project</button>
+            </div>
+            <div id="projectsList"></div>
+        </div>
+
+        <div class="section">
+            <h3>✅ Tasks</h3>
+            <div class="filters">
+                <button class="btn btn-sm" onclick="loadTasks()">🔄 Refresh</button>
+                <button class="btn btn-sm" onclick="showCreateTaskModal()">+ New Task</button>
+            </div>
+            <div id="tasksList"></div>
+        </div>
+    </div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Create Project</h3>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+    let token = localStorage.getItem('token');
+    let isLogin = true;
+    let currentTaskId = null;
+
+    if (token) {
+        showMainApp();
+    }
+
+    document.getElementById('switchLink').addEventListener('click', () => {
+        isLogin = !isLogin;
+        const title = document.getElementById('authTitle');
+        const emailGroup = document.getElementById('emailGroup');
+        const fullNameGroup = document.getElementById('fullNameGroup');
+
+        if (isLogin) {
+            title.textContent = 'Login';
+            emailGroup.style.display = 'none';
+            fullNameGroup.style.display = 'none';
+            document.getElementById('switchLink').textContent = "Don't have an account? Register";
+        } else {
+            title.textContent = 'Register';
+            emailGroup.style.display = 'block';
+            fullNameGroup.style.display = 'block';
+            document.getElementById('switchLink').textContent = 'Already have an account? Login';
+        }
+    });
+
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if (isLogin) {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.accessToken);
+                token = data.accessToken;
+                showMainApp();
+            } else {
+                alert('Login failed!');
+            }
+        } else {
+            const email = document.getElementById('email').value;
+            const fullName = document.getElementById('fullName').value;
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, fullName })
+            });
+
+            if (response.ok) {
+                alert('Registration successful! Please login.');
+                isLogin = true;
+                document.getElementById('switchLink').click();
+            } else {
+                alert('Registration failed!');
+            }
+        }
+    });
+
+    async function showMainApp() {
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+
+        const response = await fetch('/api/auth/me', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const user = await response.json();
+            document.getElementById('currentUser').textContent = `👤 ${user.username}`;
+        }
+
+        loadProjects();
+        loadTasks();
+        loadStats();
+    }
+
+    async function loadStats() {
+        try {
+            const storageRes = await fetch('/api/files/stats/storage', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (storageRes.ok) {
+                const storage = await storageRes.json();
+                const storageKB = (storage / 1024).toFixed(2);
+                document.getElementById('statsStorage').textContent = `${storageKB} KB`;
+            }
+        } catch (error) {
+            console.error('Error loading storage:', error);
+        }
+    }
+
+    async function loadProjects() {
+        try {
+            const response = await fetch('/api/projects?page=0&size=100', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('statsProjects').textContent = data.totalElements;
+                const projectsList = document.getElementById('projectsList');
+                if (data.content && data.content.length > 0) {
+                    projectsList.innerHTML = data.content.map(p => `
+                        <div class="task-card">
+                            <strong>${p.name}</strong> - ${p.description || 'No description'}
+                            <br><small>Tasks: ${p.taskCount || 0}</small>
+                            <button class="btn btn-sm" onclick="deleteProject(${p.id})">Delete</button>
+                        </div>
+                    `).join('');
+                } else {
+                    projectsList.innerHTML = '<p>No projects found.</p>';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading projects:', error);
+        }
+    }
+
+    async function loadTasks() {
+        try {
+            const response = await fetch('/api/tasks', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const tasks = await response.json();
+                document.getElementById('statsTasks').textContent = tasks.length;
+
+                const tasksList = document.getElementById('tasksList');
+                if (tasks && tasks.length > 0) {
+                    tasksList.innerHTML = tasks.map(t => `
+                        <div class="task-card">
+                            <strong>${t.title}</strong> - ${t.description || 'No description'}
+                            <br>Status: ${t.status} | Priority: ${t.priority}
+                            <br><small>Project: ${t.projectName || 'No project'}</small>
+                            <br>
+                            <button class="btn btn-sm" onclick="deleteTask(${t.id})">Delete Task</button>
+                            <button class="btn btn-sm" onclick="showUploadModal(${t.id})">📎 Upload File</button>
+                            <button class="btn btn-sm" onclick="showFilesModal(${t.id})">📁 View Files</button>
+                        </div>
+                    `).join('');
+                } else {
+                    tasksList.innerHTML = '<p>No tasks found. Create your first task!</p>';
+                }
+            } else {
+                document.getElementById('tasksList').innerHTML = '<p>Error loading tasks.</p>';
+            }
+        } catch (error) {
+            console.error('Error loading tasks:', error);
+            document.getElementById('tasksList').innerHTML = '<p>Network error.</p>';
+        }
+    }
+
+    function showCreateProjectModal() {
+        document.getElementById('modalTitle').textContent = 'Create Project';
+        document.getElementById('modalBody').innerHTML = `
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="modalName" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="modalDescription"></textarea>
+            </div>
+            <button class="btn" onclick="createProject()">Create</button>
+            <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
+        `;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    async function createProject() {
+        const response = await fetch('/api/projects', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                name: document.getElementById('modalName').value,
+                description: document.getElementById('modalDescription').value
+            })
+        });
+        if (response.ok) {
+            closeModal();
+            loadProjects();
+        } else {
+            alert('Failed to create project');
+        }
+    }
+
+    function showCreateTaskModal() {
+        document.getElementById('modalTitle').textContent = 'Create Task';
+        document.getElementById('modalBody').innerHTML = `
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="modalName" required>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="modalDescription"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Priority</label>
+                <select id="modalPriority">
+                    <option value="LOW">LOW</option>
+                    <option value="MEDIUM">MEDIUM</option>
+                    <option value="HIGH">HIGH</option>
+                    <option value="URGENT">URGENT</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Project ID (optional)</label>
+                <input type="number" id="modalProjectId">
+            </div>
+            <button class="btn" onclick="createTask()">Create</button>
+            <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
+        `;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    async function createTask() {
+        const taskData = {
+            title: document.getElementById('modalName').value,
+            description: document.getElementById('modalDescription').value,
+            priority: document.getElementById('modalPriority').value
+        };
+        const projectId = document.getElementById('modalProjectId').value;
+        if (projectId) taskData.projectId = parseInt(projectId);
+
+        const response = await fetch('/api/tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(taskData)
+        });
+
+        if (response.ok) {
+            closeModal();
+            loadTasks();
+            alert('Task created successfully!');
+        } else {
+            alert('Failed to create task');
+        }
+    }
+
+    function showUploadModal(taskId) {
+        currentTaskId = taskId;
+        document.getElementById('modalTitle').textContent = 'Upload File';
+        document.getElementById('modalBody').innerHTML = `
+            <div class="form-group">
+                <label>Select File</label>
+                <input type="file" id="uploadFile" required>
+            </div>
+            <button class="btn" onclick="uploadFile()">Upload</button>
+            <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
+        `;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    async function uploadFile() {
+        const fileInput = document.getElementById('uploadFile');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert('Please select a file');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`/api/files/upload/task/${currentTaskId}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+        });
+
+        if (response.ok) {
+            closeModal();
+            alert('File uploaded successfully!');
+            loadStats();
+        } else {
+            alert('Failed to upload file');
+        }
+    }
+
+    async function showFilesModal(taskId) {
+        const response = await fetch(`/api/files/task/${taskId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            const files = await response.json();
+            document.getElementById('modalTitle').textContent = `Files (${files.length})`;
+
+            let filesHtml = '<div style="max-height: 400px; overflow-y: auto;">';
+            if (files.length > 0) {
+                files.forEach(file => {
+                    const fileSizeKB = (file.fileSize / 1024).toFixed(2);
+                    filesHtml += `
+                        <div style="padding: 10px; border-bottom: 1px solid #ddd;">
+                            <strong>📄 ${file.fileName}</strong>
+                            <br><small>Size: ${fileSizeKB} KB | Type: ${file.fileType || 'unknown'}</small>
+                            <br>
+                            <button class="btn btn-sm" onclick="downloadFile(${file.id})">Download</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteFile(${file.id}, ${taskId})">Delete</button>
+                        </div>
+                    `;
+                });
+            } else {
+                filesHtml += '<p>No files attached.</p>';
+            }
+            filesHtml += '</div><br><button class="btn btn-sm" onclick="closeModal()">Close</button>';
+
+            document.getElementById('modalBody').innerHTML = filesHtml;
+            document.getElementById('modal').style.display = 'flex';
+        }
+    }
+
+    async function downloadFile(attachmentId) {
+        const response = await fetch(`/api/files/download/${attachmentId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'file';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } else {
+            alert('Failed to download file');
+        }
+    }
+
+    async function deleteFile(attachmentId, taskId) {
+        if (confirm('Delete this file?')) {
+            const response = await fetch(`/api/files/${attachmentId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                alert('File deleted');
+                showFilesModal(taskId);
+                loadStats();
+            } else {
+                alert('Failed to delete file');
+            }
+        }
+    }
+
+    async function deleteProject(id) {
+        if (confirm('Delete this project?')) {
+            await fetch(`/api/projects/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            loadProjects();
+        }
+    }
+
+    async function deleteTask(id) {
+        if (confirm('Delete this task?')) {
+            await fetch(`/api/tasks/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            loadTasks();
+            loadStats();
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        token = null;
+        document.getElementById('authContainer').style.display = 'flex';
+        document.getElementById('mainContainer').style.display = 'none';
+        isLogin = true;
+        document.getElementById('switchLink').textContent = "Don't have an account? Register";
+    }
+</script>
+</body>
+</html>
