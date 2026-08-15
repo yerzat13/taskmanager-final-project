@@ -1,10 +1,6 @@
 ﻿# Task Management System
 ## Author: Abdrassulayev Yerzat
 ## Technologies: Spring Boot, JWT, Docker, PostgreSQL
-# Task Management System
-
-**Автор:** Abdrassulayev Yerzat  
-**Стек:** Java, Spring Boot, PostgreSQL, Docker, JWT  
 
 
 ## Проектирование базы данных
