@@ -14,7 +14,9 @@
 run 
 
 git clone https://github.com/yerzat13/taskmanager-final-project.git
+
 docker-compose up -d
+
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 
